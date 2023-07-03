@@ -1,8 +1,8 @@
 import { TennisGame } from './TennisGame';
 
 export class TennisGame1 implements TennisGame {
-  private m_score1: number = 0;
-  private m_score2: number = 0;
+  private player1Points: number = 0;
+  private player2Points: number = 0;
   private player1Name: string;
   private player2Name: string;
 
@@ -12,59 +12,82 @@ export class TennisGame1 implements TennisGame {
   }
 
   wonPoint(playerName: string): void {
-    if (playerName === 'player1')
-      this.m_score1 += 1;
+    if (playerName === this.player1Name)
+      this.player1Points += 1;
     else
-      this.m_score2 += 1;
+      this.player2Points += 1;
   }
 
   getScore(): string {
     let score: string = '';
-    let tempScore: number = 0;
-    if (this.m_score1 === this.m_score2) {
-      switch (this.m_score1) {
-        case 0:
-          score = 'Love-All';
-          break;
-        case 1:
-          score = 'Fifteen-All';
-          break;
-        case 2:
-          score = 'Thirty-All';
-          break;
-        default:
-          score = 'Deuce';
-          break;
-
-      }
-    }
-    else if (this.m_score1 >= 4 || this.m_score2 >= 4) {
-      const minusResult: number = this.m_score1 - this.m_score2;
-      if (minusResult === 1) score = 'Advantage player1';
-      else if (minusResult === -1) score = 'Advantage player2';
-      else if (minusResult >= 2) score = 'Win for player1';
-      else score = 'Win for player2';
-    }
-    else {
-      for (let i = 1; i < 3; i++) {
-        if (i === 1) tempScore = this.m_score1;
-        else { score += '-'; tempScore = this.m_score2; }
-        switch (tempScore) {
-          case 0:
-            score += 'Love';
-            break;
-          case 1:
-            score += 'Fifteen';
-            break;
-          case 2:
-            score += 'Thirty';
-            break;
-          case 3:
-            score += 'Forty';
-            break;
-        }
-      }
+    if (this.isDeuce()) {
+      score = 'Deuce';
+    } else if (this.player1Advantage()) {
+      score = 'Advantage ' + this.player1Name;
+    } else if (this.player2Advantage()) {
+      score = 'Advantage ' + this.player2Name;
+    } else if (this.player1Wins()) {
+      score = 'Win for ' + this.player1Name;
+    } else if (this.player2Wins()) {
+      score = 'Win for ' + this.player2Name;
+    } else if (this.isTiedAndNotDeuce()) {
+      score = this.getPlayer1Score() + '-' + this.getPlayer2Score();
+    } else {
+      score = this.getPlayer1Score() + '-All';
     }
     return score;
+  }
+
+  private pointsDifference() {
+    return this.player1Points - this.player2Points;
+  }
+
+  private player1Wins() {
+    return this.aPlayerHas4Points() && this.pointsDifference() >= 2;
+  }
+
+  private player2Wins() {
+    return this.aPlayerHas4Points() && this.pointsDifference() <= 2;
+  }
+
+  private player2Advantage() {
+    return this.aPlayerHas4Points() && this.pointsDifference() === -1;
+  }
+
+  private player1Advantage() {
+    return this.aPlayerHas4Points() && this.pointsDifference() === 1;
+  }
+
+  private aPlayerHas4Points() {
+    return this.player1Points >= 4 || this.player2Points >= 4;
+  }
+
+  private isDeuce() {
+    return this.player1Points === this.player2Points && this.player1Points >= 3;
+  }
+
+  private isTiedAndNotDeuce() {
+    return this.pointsDifference() === 0 && this.player1Points < 3;
+  }
+
+  private getPlayer1Score() {
+    return this.getPlayerScore(this.player1Points);
+  }
+
+  private getPlayer2Score() {
+    return this.getPlayerScore(this.player2Points);
+  }
+  
+  private getPlayerScore(points: number) {
+    switch (points) {
+      case 0:
+        return 'Love';
+      case 1:
+        return 'Fifteen';
+      case 2:
+        return 'Thirty';
+      default:
+        return 'Forty';
+    }
   }
 }
