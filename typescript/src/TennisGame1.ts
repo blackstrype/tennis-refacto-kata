@@ -31,9 +31,9 @@ export class TennisGame1 implements TennisGame {
     } else if (this.player2Wins()) {
       score = 'Win for ' + this.player2Name;
     } else if (this.isTiedAndNotDeuce()) {
-      score = this.getPlayer1Score() + '-' + this.getPlayer2Score();
-    } else {
       score = this.getPlayer1Score() + '-All';
+    } else {
+      score = this.getPlayer1Score() + '-' + this.getPlayer2Score();
     }
     return score;
   }
